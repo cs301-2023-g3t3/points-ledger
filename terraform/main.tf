@@ -42,12 +42,6 @@ resource "aws_lambda_function" "this" {
   }
 }
 
-# resource "aws_api_gateway_resource" "this" {
-#   rest_api_id = "vm1swtn9ii"
-#   parent_id   = "9gy5jtm4yf"
-#   path_part   = "points"
-# }
-
 resource "aws_api_gateway_resource" "this" {
   rest_api_id = "vm1swtn9ii"
   parent_id   = "9gy5jtm4yf"

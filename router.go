@@ -39,7 +39,7 @@ func InitRoutes() {
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
 	pointsGroup.POST("/:ID", points.AdjustPoints)
 
-	env := os.Getenv("env")
+	env := os.Getenv("ENV")
 	if env == "lambda" {
 		ginLambda = ginadapter.New(router)
 		lambda.Start(Handler)

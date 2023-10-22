@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"os"
+	"fmt"
 
 	"github.com/cs301-2023-g3t3/points-ledger/controllers"
 	"github.com/cs301-2023-g3t3/points-ledger/models"
+	"github.com/cs301-2023-g3t3/points-ledger/middlewares"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,14 +18,26 @@ import (
 var ginLambda *ginadapter.GinLambda
 
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
+	fmt.Println("agent: ", req.RequestContext.Identity.UserAgent)
+	fmt.Println("ip add: ", req.RequestContext.Identity.SourceIP)
+	metadata := models.RequestMetadata{
+        UserAgent: req.RequestContext.Identity.UserAgent,
+        SourceIP:  req.RequestContext.Identity.SourceIP,
+    }
+
+	// ctx = context.WithValue(ctx, "UserAgent", req.RequestContext.Identity.UserAgent)
+    // ctx = context.WithValue(ctx, "SourceIP", req.RequestContext.Identity.SourceIP)
+	ctx = context.WithValue(ctx, "RequestMetadata", metadata)
+
 	return ginLambda.ProxyWithContext(ctx, req)
 }
 
 func InitRoutes() {
-	router := gin.Default()
-
-	router.Use(gin.Logger())
+	router := gin.New()
+	// router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(middlewares.LoggingMiddleware())
 
 	health := new(controllers.HealthController)
 	points := new(controllers.PointsController)

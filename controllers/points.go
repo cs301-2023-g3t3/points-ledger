@@ -49,17 +49,24 @@ func (s PointsController) GetSpecificAccount(c *gin.Context) {
 }
 
 func (s PointsController) AdjustPoints(c *gin.Context) {
-
+	
 	accountID := c.Param("ID")
-	var input struct {
-		Action string `json:"action"`
-		Amount int    `json:"amount"`
-	}
+	var input models.Input
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: "Invalid payload request"})
 		return
 	}
+
+	c.Set("input", input)
+
+	if input.Amount < 0 {
+		message := "Negative values are not allowed"
+		c.Set("message", message)
+		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
+			return
+	}
+	
 
 	var account models.PointsAccount
 	if err := s.db.Where("ID = ?", accountID).First(&account).Error; err != nil {
@@ -74,20 +81,26 @@ func (s PointsController) AdjustPoints(c *gin.Context) {
 		if account.Balance >= input.Amount {
 			account.Balance -= input.Amount
 		} else {
-			c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: "Insufficient points to deduct"})
+			message := "Insufficient points to deduct"
+			c.Set("message", message)
+			c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
 			return
 		}
 	case "override":
 		account.Balance = input.Amount
 	default:
-		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: "Invalid action"})
+		message := "Invalid action"
+		c.Set("message", message)
+		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
 		return
 	}
 
 	s.db.Save(&account)
-
+	
+	message := "Points adjusted successfully"
+	c.Set("message", message)
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Points adjusted successfully",
+		"message":     message,
 		"new_balance": account.Balance,
 	})
 }

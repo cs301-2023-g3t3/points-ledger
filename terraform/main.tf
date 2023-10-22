@@ -70,6 +70,7 @@ resource "aws_api_gateway_method" "this" {
   rest_api_id      = "vm1swtn9ii"
   resource_id      = aws_api_gateway_resource.this.id
   http_method      = "ANY"
-  authorization    = "NONE"
+  authorization    = "CUSTOM"
+  authorizer_id    = "kjkxid"
   api_key_required = false
 }

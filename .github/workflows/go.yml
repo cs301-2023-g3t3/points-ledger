@@ -16,16 +16,16 @@ jobs:
           go-version: "1.21"
 
       - name: Build
-        run: GOOS=linux GOARCH=amd64 go build -o main *.go
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main *.go
 
       - name: Zip
-        run: zip ./main.zip main
+        run: zip ./terraform/main.zip main
 
       - name: Upload zip file
         uses: actions/upload-artifact@v3
         with:
           name: main
-          path: ./
+          path: ./terraform
 
       - name: Set up Terrform
         uses: hashicorp/setup-terraform@v2
@@ -42,7 +42,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: main
-          path: ./
+          path: ./terraform
 
       - name: Show current directory files
         run: ls -ll

@@ -35,8 +35,8 @@ resource "aws_lambda_function" "this" {
   runtime          = "go1.x"
   handler          = "main"
   role             = aws_iam_role.lambda_role.arn
-  filename         = "../main.zip"
-  source_code_hash = filebase64sha256("../main.zip")
+  filename         = "./main.zip"
+  source_code_hash = filebase64sha256("./main.zip")
   timeout          = 10
 
   environment {

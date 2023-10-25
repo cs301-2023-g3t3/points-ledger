@@ -25,4 +25,5 @@ terraform/terraform.tfstate.backup
 **/.zip
 .env
 main
+.main**
 main.zip

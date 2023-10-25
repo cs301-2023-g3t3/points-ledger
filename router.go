@@ -51,7 +51,7 @@ func InitRoutes() {
 	points.SetDB(models.DB)
 	pointsGroup.GET("", points.GetAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
-	pointsGroup.POST("/:ID", points.AdjustPoints)
+	pointsGroup.PUT("/:ID", points.AdjustPoints)
 
 	env := os.Getenv("ENV")
 	if env == "lambda" {

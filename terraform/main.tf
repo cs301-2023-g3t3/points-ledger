@@ -2,6 +2,15 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+terraform {
+  backend "s3" {
+    bucket         = "itsa-terraform-states"
+    key            = "points-ledger-terraform.tfstate"
+    region         = "ap-southeast-1"
+    dynamodb_table = "points-ledger-terraform-state-lock"
+  }
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-execution-role"
 

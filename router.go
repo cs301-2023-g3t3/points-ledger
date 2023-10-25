@@ -42,12 +42,12 @@ func InitRoutes() {
 	health := new(controllers.HealthController)
 	points := new(controllers.PointsController)
 
-	v1 := router.Group("/api/v1")
+	v1 := router.Group("/points")
 
 	healthGroup := v1.Group("/health")
 	healthGroup.GET("", health.CheckHealth)
 
-	pointsGroup := v1.Group("/points")
+	pointsGroup := v1.Group("accounts")
 	points.SetDB(models.DB)
 	pointsGroup.GET("", points.GetAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)

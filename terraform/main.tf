@@ -51,9 +51,15 @@ resource "aws_lambda_function" "this" {
   }
 }
 
-resource "aws_api_gateway_resource" "this" {
+resource "aws_api_gateway_resource" "root" {
   rest_api_id = "vm1swtn9ii"
   parent_id   = "9gy5jtm4yf"
+  path_part   = "points"
+}
+
+resource "aws_api_gateway_resource" "this" {
+  rest_api_id = "vm1swtn9ii"
+  parent_id   = aws_api_gateway_resource.root.id
   path_part   = "{proxy+}"
 }
 
@@ -63,7 +69,7 @@ resource "aws_lambda_permission" "this" {
   function_name = aws_lambda_function.this.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:ap-southeast-1:345215350058:vm1swtn9ii/*/*/*"
+  source_arn = "arn:aws:execute-api:ap-southeast-1:345215350058:vm1swtn9ii/*/*/points/*"
 }
 
 resource "aws_api_gateway_integration" "this" {

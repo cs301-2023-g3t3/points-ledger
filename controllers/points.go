@@ -48,6 +48,19 @@ func (s PointsController) GetSpecificAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
+func (s PointsController) GetAccountByUser(c *gin.Context) {
+
+	userID := c.Param("UserID")
+	var account models.PointsAccount
+
+	if err := s.db.First(&account, "user_id = ?", userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, models.HTTPError{Code: http.StatusNotFound, Message: "Account not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, account)
+}
+
 func (s PointsController) AdjustPoints(c *gin.Context) {
 	
 	accountID := c.Param("ID")

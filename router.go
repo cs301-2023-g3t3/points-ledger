@@ -53,6 +53,7 @@ func InitRoutes() {
 	points.SetDB(models.DB)
 	pointsGroup.GET("", points.GetAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
+	pointsGroup.GET("/user-account/:UserID", points.GetAccountByUser)
 	pointsGroup.PUT("/:ID", points.AdjustPoints)
 
 	env := os.Getenv("ENV")

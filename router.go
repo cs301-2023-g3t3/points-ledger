@@ -23,12 +23,12 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	fmt.Println("agent: ", req.RequestContext.Identity.UserAgent)
 	fmt.Println("ip add: ", req.RequestContext.Identity.SourceIP)
 	metadata := models.RequestMetadata{
-        UserAgent: req.RequestContext.Identity.UserAgent,
-        SourceIP:  req.RequestContext.Identity.SourceIP,
-    }
+		UserAgent: req.RequestContext.Identity.UserAgent,
+		SourceIP:  req.RequestContext.Identity.SourceIP,
+	}
 
 	// ctx = context.WithValue(ctx, "UserAgent", req.RequestContext.Identity.UserAgent)
-    // ctx = context.WithValue(ctx, "SourceIP", req.RequestContext.Identity.SourceIP)
+	// ctx = context.WithValue(ctx, "SourceIP", req.RequestContext.Identity.SourceIP)
 	ctx = context.WithValue(ctx, "RequestMetadata", metadata)
 
 	return ginLambda.ProxyWithContext(ctx, req)

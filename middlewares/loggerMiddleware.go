@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	// "encoding/json"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"time"
 
@@ -30,7 +30,7 @@ func LoggingMiddleware() gin.HandlerFunc {
 		endTime := time.Now()
 
 		// Execution time
-		latencyTime := endTime.Sub(startTime)
+		latencyTime := endTime.Sub(startTime).Milliseconds()
 
 		// Request data
 		reqMethod := ctx.Request.Method
@@ -44,14 +44,11 @@ func LoggingMiddleware() gin.HandlerFunc {
 			// Access the UserAgent and SourceIP
 			userAgent = metadata.UserAgent
 			sourceIP = metadata.SourceIP
-
-			fmt.Println("UserAgent in middleware: ", userAgent)
-			fmt.Println("SourceIP in middleware: ", sourceIP)
 		}
 
 		// Request IP
 
-		if reqMethod == http.MethodPost {
+		if reqMethod == http.MethodPut {
 			input, _ := ctx.Get("input")
 			message, _ := ctx.Get("message")
 			inputData := input.(models.Input)
@@ -71,15 +68,15 @@ func LoggingMiddleware() gin.HandlerFunc {
 			}).Info("HTTP POST REQUEST")
 		}
 
-		if reqMethod == http.MethodGet {
-			log.WithFields(log.Fields{
-				"METHOD":     reqMethod,
-				"URI":        reqUri,
-				"STATUS":     statusCode,
-				"LATENCY":    latencyTime,
-				"USER_AGENT": userAgent,
-				"CLIENT_IP":  sourceIP,
-			}).Info("HTTP GET REQUEST")
-		}
+		// if reqMethod == http.MethodGet {
+		// 	log.WithFields(log.Fields{
+		// 		"METHOD":     reqMethod,
+		// 		"URI":        reqUri,
+		// 		"STATUS":     statusCode,
+		// 		"LATENCY":    latencyTime,
+		// 		"USER_AGENT": userAgent,
+		// 		"CLIENT_IP":  sourceIP,
+		// 	}).Info("HTTP GET REQUEST")
+		// }
 	}
 }

@@ -27,3 +27,7 @@ terraform/terraform.tfstate.backup
 main
 .main**
 main.zip
+
+compose.yaml
+Dockerfile
+api

@@ -42,7 +42,7 @@ func InitRoutes() {
 	router.Use(middlewares.LoggingMiddleware())
 
 	health := new(controllers.HealthController)
-	points := new(controllers.PointsController)
+	points := controllers.NewPointsController(*models.DB)
 
 	v1 := router.Group("/points")
 

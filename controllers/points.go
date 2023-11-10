@@ -1,115 +1,101 @@
 package controllers
 
 import (
-	"github.com/cs301-2023-g3t3/points-ledger/models"
+	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/cs301-2023-g3t3/points-ledger/models"
+	"github.com/cs301-2023-g3t3/points-ledger/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type PointsController struct{
-	db *gorm.DB
+	DB *gorm.DB
+    PointsService *services.PointsService
+}
+
+func NewPointsController(db gorm.DB) *PointsController {
+    return &PointsController{
+        DB: &db,
+        PointsService: services.NewPointsService(&db),
+    }
 }
 
 func (s *PointsController) SetDB(db *gorm.DB) {
-    s.db = db
+    s.DB = db
 }
 
 func (s PointsController) GetAccounts(c *gin.Context) {
 	userID := c.Query("userID")
 
-	var accounts []models.PointsAccount
-	query := s.db
+    accounts, code, err := s.PointsService.GetAccounts(userID)
+    if err != nil {
+        c.JSON(code, models.HTTPError{
+            Code: code,
+            Message: err.Error(),
+        })
+        return
+    }
 
-	if userID != "" {
-		query = query.Where("user_id = ?", userID)
-	}
-
-	if err := query.Find(&accounts).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.HTTPError{Code: http.StatusInternalServerError, Message: "Error fetching points accounts"})
-		return
-	}
-
-	c.JSON(http.StatusOK, accounts)
-
+	c.JSON(code, *accounts)
 }
 
 func (s PointsController) GetSpecificAccount(c *gin.Context) {
-
 	accountID := c.Param("ID")
-	var account models.PointsAccount
 
-	if err := s.db.First(&account, "ID = ?", accountID).Error; err != nil {
-		c.JSON(http.StatusNotFound, models.HTTPError{Code: http.StatusNotFound, Message: "Account not found"})
-		return
-	}
+    account, code, err := s.PointsService.GetAccountById(accountID)
+    if err != nil {
+        c.JSON(code, models.HTTPError{
+            Code: code,
+            Message: err.Error(),
+        })
+        return
+    }
 
-	c.JSON(http.StatusOK, account)
+	c.JSON(code, *account)
 }
 
 func (s PointsController) GetAccountByUser(c *gin.Context) {
-
 	userID := c.Param("UserID")
-	var account models.PointsAccount
 
-	if err := s.db.First(&account, "user_id = ?", userID).Error; err != nil {
-		c.JSON(http.StatusNotFound, models.HTTPError{Code: http.StatusNotFound, Message: "Account not found"})
-		return
-	}
+    accounts, code, err := s.PointsService.GetAccountByUserId(userID)
+    if err != nil {
+        c.JSON(code, models.HTTPError{
+            Code: code,
+            Message: err.Error(),
+        })
+    }
 
-	c.JSON(http.StatusOK, account)
+	c.JSON(code, *accounts)
 }
 
 func (s PointsController) AdjustPoints(c *gin.Context) {
-	
 	accountID := c.Param("ID")
 	var input models.Input
+    if err := json.NewDecoder(c.Request.Body).Decode(&input); err != nil {
+        c.Set("message", err.Error())
+        c.JSON(http.StatusBadRequest, models.HTTPError{
+            Code: http.StatusBadRequest,
+            Message: fmt.Sprintf("Invalid JSON request: %v", err.Error()),
+        })
+        return
+    }
 
-	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: "Invalid payload request"})
-		return
-	}
+    account, code, err := s.PointsService.AdjustPoints(&input, accountID)
+    if err != nil {
+        c.Set("message", err.Error())
+        c.JSON(code, models.HTTPError{
+            Code: code,
+            Message: err.Error(),
+        })
+        return
+    }
 
 	c.Set("input", input)
 
-	if input.Amount < 0 {
-		message := "Negative values are not allowed"
-		c.Set("message", message)
-		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
-			return
-	}
-	
-
-	var account models.PointsAccount
-	if err := s.db.Where("ID = ?", accountID).First(&account).Error; err != nil {
-		c.JSON(http.StatusNotFound, models.HTTPError{Code: http.StatusNotFound, Message: "Account not found"})
-		return
-	}
-
-	switch input.Action {
-	case "add":
-		account.Balance += input.Amount
-	case "deduct":
-		if account.Balance >= input.Amount {
-			account.Balance -= input.Amount
-		} else {
-			message := "Insufficient points to deduct"
-			c.Set("message", message)
-			c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
-			return
-		}
-	case "override":
-		account.Balance = input.Amount
-	default:
-		message := "Invalid action"
-		c.Set("message", message)
-		c.JSON(http.StatusBadRequest, models.HTTPError{Code: http.StatusBadRequest, Message: message})
-		return
-	}
-
-	s.db.Save(&account)
-	
 	message := "Points adjusted successfully"
 	c.Set("message", message)
 	c.JSON(http.StatusOK, gin.H{

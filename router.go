@@ -50,7 +50,6 @@ func InitRoutes() {
 	healthGroup.GET("", health.CheckHealth)
 
 	pointsGroup := v1.Group("/accounts")
-	points.SetDB(models.DB)
 	pointsGroup.GET("", points.GetAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
 	pointsGroup.GET("/user-account/:UserID", points.GetAccountByUser)

@@ -13,19 +13,13 @@ import (
 )
 
 type PointsController struct{
-	DB *gorm.DB
     PointsService *services.PointsService
 }
 
 func NewPointsController(db gorm.DB) *PointsController {
     return &PointsController{
-        DB: &db,
         PointsService: services.NewPointsService(&db),
     }
-}
-
-func (s *PointsController) SetDB(db *gorm.DB) {
-    s.DB = db
 }
 
 func (s PointsController) GetAccounts(c *gin.Context) {

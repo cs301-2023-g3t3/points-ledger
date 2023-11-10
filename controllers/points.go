@@ -22,10 +22,8 @@ func NewPointsController(db gorm.DB) *PointsController {
     }
 }
 
-func (s PointsController) GetAccounts(c *gin.Context) {
-	userID := c.Query("userID")
-
-    accounts, code, err := s.PointsService.GetAccounts(userID)
+func (s PointsController) GetAllAccounts(c *gin.Context) {
+    accounts, code, err := s.PointsService.GetAllAccounts()
     if err != nil {
         c.JSON(code, models.HTTPError{
             Code: code,

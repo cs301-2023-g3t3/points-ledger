@@ -19,7 +19,7 @@ func NewPointsService(db *gorm.DB) *PointsService {
     return &PointsService{DB: db}
 }
 
-func (s *PointsService) GetAccounts(userID string) (*[]models.PointsAccount, int, error) {
+func (s *PointsService) GetAllAccounts() (*[]models.PointsAccount, int, error) {
 	var accounts []models.PointsAccount
 
 	if err := s.DB.Find(&accounts).Error; err != nil {
@@ -105,7 +105,11 @@ func (s *PointsService) AdjustPoints (input *models.Input, id string) (*models.P
         return nil, http.StatusBadRequest, errors.New("invalid action")
     }
 
-    if err := s.DB.Save(&account).Error; err != nil {
+    account.Id = id
+
+    err := s.DB.Model(models.PointsAccount{Id: id}).Updates(&account).Error
+
+    if err != nil {
         return nil, http.StatusInternalServerError, err
     }
 

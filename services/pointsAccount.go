@@ -92,11 +92,11 @@ func (s *PointsService) AdjustPoints (input *models.Input, id string) (*models.P
         account.Balance += input.Amount
         break
     case "deduct":
-        // if account.Balance >= input.Amount {
+        if account.Balance >= input.Amount {
             account.Balance -= input.Amount
-        // } else {
-        //     return nil, http.StatusBadRequest, errors.New("insufficient points to deduct")
-        // }
+        } else {
+            return nil, http.StatusBadRequest, errors.New("insufficient points to deduct")
+        }
         break
     case "override":
         account.Balance = input.Amount

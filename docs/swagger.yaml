@@ -1,0 +1,150 @@
+definitions:
+  models.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  models.PointsAccount:
+    properties:
+      balance:
+        type: integer
+      id:
+        type: string
+      userId:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /accounts:
+    get:
+      description: Retrieves a list of point accounts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PointsAccount'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Get all Point Accounts
+      tags:
+      - points
+  /accounts/{id}:
+    get:
+      description: Retrieve a list of Points Account By UserID
+      parameters:
+      - description: UserID
+        in: path
+        name: UserID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PointsAccount'
+            type: array
+        "400":
+          description: Id cannot be empty
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "404":
+          description: Points Account not found with Id
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Get Points Account by UserId
+      tags:
+      - points
+    put:
+      description: Update Points By Id
+      parameters:
+      - description: ID
+        in: path
+        name: ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Points adjusted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request due to invalid JSON body
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "404":
+          description: User not found with Id
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Update Points by Id
+      tags:
+      - points
+  /accounts/paginate:
+    get:
+      description: Retrieves a list of point accounts
+      parameters:
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: size
+        in: query
+        name: size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PointsAccount'
+            type: array
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Get all Point Accounts by Pagination
+      tags:
+      - points
+  /health:
+    get:
+      description: Check the health of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucess
+      summary: Get Health
+      tags:
+      - health
+swagger: "2.0"

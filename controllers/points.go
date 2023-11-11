@@ -23,6 +23,13 @@ func NewPointsController(db gorm.DB) *PointsController {
     }
 }
 
+//  @Summary        Get all Point Accounts
+//  @Description    Retrieves a list of point accounts
+//  @Tags           points
+//  @Produce        json
+//  @Success        200     {array}     models.PointsAccount
+//  @Failure        500     {object}    models.HTTPError
+//  @Router         /accounts   [get]
 func (s PointsController) GetAllAccounts(c *gin.Context) {
     accounts, code, err := s.PointsService.GetAllAccounts()
     if err != nil {
@@ -36,6 +43,16 @@ func (s PointsController) GetAllAccounts(c *gin.Context) {
 	c.JSON(code, *accounts)
 }
 
+//  @Summary        Get all Point Accounts by Pagination
+//  @Description    Retrieves a list of point accounts
+//  @Tags           points
+//  @Produce        json
+//  @Param          page    query   int     true    "page"
+//  @Param          size    query   int     true    "size"
+//  @Success        200     {array}     models.PointsAccount
+//  @Failure        400     {object}    models.HTTPError    "Invalid parameters"
+//  @Failure        500     {object}    models.HTTPError
+//  @Router         /accounts/paginate   [get]
 func (s PointsController) GetPaginatedAccounts(c *gin.Context) {
     page := c.DefaultQuery("page", "1")  
     pageSize := c.DefaultQuery("size", "10")  
@@ -74,7 +91,16 @@ func (s PointsController) GetPaginatedAccounts(c *gin.Context) {
     })
 }
 
-
+//  @Summary        Get Points Account by Id
+//  @Description    Retrieve an Account By ID
+//  @Tags           points
+//  @Produce        json
+//  @Param          ID      path    string  true    "ID"
+//  @Success        200     {object}    models.PointsAccount
+//  @Failure        400     {object}    models.HTTPError    "Id cannot be empy"
+//  @Failure        404     {object}    models.HTTPError    "Points Account not found with Id"
+//  @Failure        500     {object}    models.HTTPError
+//  @Router         /accounts/{id}   [get]
 func (s PointsController) GetSpecificAccount(c *gin.Context) {
 	accountID := c.Param("ID")
 
@@ -90,6 +116,16 @@ func (s PointsController) GetSpecificAccount(c *gin.Context) {
 	c.JSON(code, *account)
 }
 
+//  @Summary        Get Points Account by UserId
+//  @Description    Retrieve a list of Points Account By UserID
+//  @Tags           points
+//  @Produce        json
+//  @Param          UserID      path    string  true    "UserID"
+//  @Success        200     {array}     models.PointsAccount
+//  @Failure        400     {object}    models.HTTPError    "Id cannot be empty"
+//  @Failure        404     {object}    models.HTTPError    "Points Account not found with Id"
+//  @Failure        500     {object}    models.HTTPError
+//  @Router         /accounts/{id}   [get]
 func (s PointsController) GetAccountByUser(c *gin.Context) {
 	userID := c.Param("UserID")
 
@@ -104,6 +140,16 @@ func (s PointsController) GetAccountByUser(c *gin.Context) {
 	c.JSON(code, *accounts)
 }
 
+//  @Summary        Update Points by Id
+//  @Description    Update Points By Id
+//  @Tags           points
+//  @Produce        json
+//  @Param          ID      path    string  true    "ID"
+//  @Success        200     {string}    "Points adjusted successfully"
+//  @Failure        400     {object}    models.HTTPError    "Bad request due to invalid JSON body"
+//  @Failure        404     {object}    models.HTTPError    "User not found with Id"
+//  @Failure        500     {object}    models.HTTPError
+//  @Router         /accounts/{id}   [put]
 func (s PointsController) AdjustPoints(c *gin.Context) {
 	accountID := c.Param("ID")
 	var input models.Input

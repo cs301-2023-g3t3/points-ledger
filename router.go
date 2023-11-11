@@ -38,14 +38,12 @@ func InitRoutes() {
 	router := gin.New()
 	// router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-	router.Use(cors.Default())
+	// router.Use(cors.Default())
 	router.Use(middlewares.LoggingMiddleware())
   
 	config := cors.DefaultConfig()
-	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
-	config.AllowHeaders = append(config.AllowHeaders, "id_token")
+    config.AddAllowHeaders("Authorization", "id_token")
 	config.AllowAllOrigins = true
-
 	router.Use(cors.New(config))
 
 	health := new(controllers.HealthController)

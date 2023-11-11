@@ -42,7 +42,7 @@ func InitRoutes() {
 	router.Use(middlewares.LoggingMiddleware())
   
 	config := cors.DefaultConfig()
-    config.AddAllowHeaders("Authorization", "id_token")
+    config.AddAllowHeaders("Authorization", "X-IDTOKEN")
 	config.AllowAllOrigins = true
 	router.Use(cors.New(config))
 

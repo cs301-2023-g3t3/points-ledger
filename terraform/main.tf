@@ -52,6 +52,7 @@ resource "aws_lambda_function" "this" {
       DB_USER     = data.aws_ssm_parameter.db_user.value
       DB_PASSWORD = data.aws_ssm_parameter.db_password.value
       DB_NAME     = "itsa"
+      JWT_SECRET  = data.aws_ssm_parameter.jwt_secret.value
     }
   }
 }

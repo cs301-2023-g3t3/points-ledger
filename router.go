@@ -55,6 +55,8 @@ func InitRoutes() {
 	pointsGroup.GET("/paginate", points.GetPaginatedAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
 	pointsGroup.GET("/user-account/:UserID", points.GetAccountByUser)
+
+	pointsGroup.Use(middlewares.DecodeJWT())
 	pointsGroup.PUT("/:ID", points.AdjustPoints)
 
 	env := os.Getenv("ENV")

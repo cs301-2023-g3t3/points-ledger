@@ -55,11 +55,30 @@ func LoggingMiddleware() gin.HandlerFunc {
 			action := inputData.Action
 			amount := inputData.Amount
 
+			data, ok := ctx.Get("userDetails")
+			if !ok {
+				ctx.JSON(http.StatusInternalServerError, models.HTTPError{
+					Code: http.StatusInternalServerError,
+					Message: "Error",
+				})
+				ctx.Abort()
+
+			}
+			userDetailsObj, ok := data.(map[string]interface{})
+			if !ok {
+				ctx.JSON(http.StatusInternalServerError, models.HTTPError{
+					Code: http.StatusInternalServerError,
+					Message: "Error",
+				}) 
+				ctx.Abort()
+			}
+
 			log.WithFields(log.Fields{
 				"METHOD":     reqMethod,
 				"URI":        reqUri,
 				"STATUS":     statusCode,
 				"LATENCY":    latencyTime,
+				"ACTOR":      userDetailsObj["user_id"],
 				"USER_AGENT": userAgent,
 				"SOURCE_IP":  sourceIP,
 				"ACTION":     action,

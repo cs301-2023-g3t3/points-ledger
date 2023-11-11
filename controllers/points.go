@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/cs301-2023-g3t3/points-ledger/models"
 	"github.com/cs301-2023-g3t3/points-ledger/services"
@@ -34,6 +35,45 @@ func (s PointsController) GetAllAccounts(c *gin.Context) {
 
 	c.JSON(code, *accounts)
 }
+
+func (s PointsController) GetPaginatedAccounts(c *gin.Context) {
+    page := c.DefaultQuery("page", "1")  
+    pageSize := c.DefaultQuery("size", "10")  
+
+    // Convert page and pageSize to integers
+    pageInt, err := strconv.Atoi(page)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, models.HTTPError{
+            Code:    http.StatusBadRequest,
+            Message: "Invalid page parameter",
+        })
+        return
+    }
+
+    pageSizeInt, err := strconv.Atoi(pageSize)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, models.HTTPError{
+            Code:    http.StatusBadRequest,
+            Message: "Invalid pageSize parameter",
+        })
+        return
+    }
+
+    accounts, code, err := s.PointsService.GetPaginatedAccounts(pageInt, pageSizeInt)
+    if err != nil {
+        c.JSON(code, models.HTTPError{
+            Code:    code,
+            Message: err.Error(),
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "data":       accounts,
+        "pagination": gin.H{"page": pageInt, "size": pageSizeInt},
+    })
+}
+
 
 func (s PointsController) GetSpecificAccount(c *gin.Context) {
 	accountID := c.Param("ID")

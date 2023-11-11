@@ -20,15 +20,11 @@ var ginLambda *ginadapter.GinLambda
 
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	fmt.Println("agent: ", req.RequestContext.Identity.UserAgent)
-	fmt.Println("ip add: ", req.RequestContext.Identity.SourceIP)
 	metadata := models.RequestMetadata{
 		UserAgent: req.RequestContext.Identity.UserAgent,
 		SourceIP:  req.RequestContext.Identity.SourceIP,
 	}
 
-	// ctx = context.WithValue(ctx, "UserAgent", req.RequestContext.Identity.UserAgent)
-	// ctx = context.WithValue(ctx, "SourceIP", req.RequestContext.Identity.SourceIP)
 	ctx = context.WithValue(ctx, "RequestMetadata", metadata)
 
 	return ginLambda.ProxyWithContext(ctx, req)
@@ -53,9 +49,11 @@ func InitRoutes() {
 
 	healthGroup := v1.Group("/health")
 	healthGroup.GET("", health.CheckHealth)
+	
 
 	pointsGroup := v1.Group("/accounts")
 	pointsGroup.GET("", points.GetAllAccounts)
+	pointsGroup.GET("/paginate", points.GetPaginatedAccounts)
 	pointsGroup.GET("/:ID", points.GetSpecificAccount)
 	pointsGroup.GET("/user-account/:UserID", points.GetAccountByUser)
 	pointsGroup.PUT("/:ID", points.AdjustPoints)

@@ -65,7 +65,7 @@ func LoggingMiddleware() gin.HandlerFunc {
 				"ACTION":     action,
 				"AMOUNT":     amount,
 				"MESSAGE":    message,
-			}).Info("HTTP POST REQUEST")
+			}).Info("ADJUST POINTS REQUEST")
 		}
 
 		// if reqMethod == http.MethodGet {

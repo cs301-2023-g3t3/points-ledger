@@ -29,6 +29,20 @@ func (s *PointsService) GetAllAccounts() (*[]models.PointsAccount, int, error) {
 	return &accounts, http.StatusOK, nil
 }
 
+
+func (s *PointsService) GetPaginatedAccounts(page, pageSize int) (*[]models.PointsAccount, int, error) {
+    var accounts []models.PointsAccount
+
+    offset := (page - 1) * pageSize
+
+    if err := s.DB.Offset(offset).Limit(pageSize).Find(&accounts).Error; err != nil {
+        return nil, http.StatusInternalServerError, err
+    }
+
+    return &accounts, http.StatusOK, nil
+}
+
+
 func (s *PointsService) GetAccountById(id string) (*models.PointsAccount, int, error) {
     if id == "" {
         return nil, http.StatusBadRequest, errors.New("id cannot be empty")

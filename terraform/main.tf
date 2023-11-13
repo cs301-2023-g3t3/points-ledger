@@ -11,38 +11,6 @@ terraform {
   }
 }
 
-resource "aws_iam_policy" "lambda_rds_permissions" {
-  name = "lambda-rds-permissions"
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "Statement1",
-            "Effect": "Allow",
-            "Action": [
-                "rds-data:BatchExecuteStatement",
-                "rds-data:BeginTransaction",
-                "rds-data:CommitTransaction",
-                "rds-data:ExecuteSql",
-                "rds-data:ExecuteStatement",
-                "rds-data:RollbackTransaction",
-                "rds-db:connect"
-            ],
-            "Resource": [
-                "arn:aws:rds:ap-southeast-1:345215350058:cluster:itsa-db"
-            ]
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_rds_permissions_attachment" {
-  policy_arn = aws_iam_policy.lambda_rds_permissions.arn
-  role = aws_iam_role.lambda_role.name
-}
-
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-execution-role"
 

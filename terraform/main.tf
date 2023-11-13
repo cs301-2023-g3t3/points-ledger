@@ -11,6 +11,33 @@ terraform {
   }
 }
 
+resource "aws_iam_policy" "lambda_rds_permissions" {
+  name = "lambda-rds-permissions"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Action": [
+                "rds-data:BatchExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:ExecuteSql",
+                "rds-data:ExecuteStatement",
+                "rds-data:RollbackTransaction",
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds:ap-southeast-1:345215350058:cluster:itsa-db"
+            ]
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-execution-role"
 
@@ -25,8 +52,10 @@ resource "aws_iam_role" "lambda_role" {
     ]
   })
 
+  inline_policy = aws_iam_policy.lambda_rds_permissions.policy
+
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AdministratorAccess"
+    "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
   ]
 }
 

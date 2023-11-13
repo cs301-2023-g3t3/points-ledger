@@ -38,6 +38,11 @@ resource "aws_iam_policy" "lambda_rds_permissions" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_rds_permissions_attachment" {
+  policy_arn = aws_iam_policy.lambda_rds_permissions.arn
+  role = aws_iam_role.lambda_role.name
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-execution-role"
 
@@ -51,10 +56,6 @@ resource "aws_iam_role" "lambda_role" {
       }
     ]
   })
-
-  inline_policy = [
-        aws_iam_policy.lambda_rds_permissions.policy
-  ]
 
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
